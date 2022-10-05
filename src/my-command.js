@@ -6,6 +6,9 @@ export default function() {
   const { selectedPage } = sketch.getSelectedDocument();
 
   let currentX = 0;
+  let i = 0;
+  let width = 100;
+  let height = 100;
 
   dialog.showOpenDialog(
     {
@@ -25,9 +28,35 @@ export default function() {
           importer.prepareToImportFromURL_error(NSURL.fileURLWithPath(filepath), null);
         }
 
-        const width = importer.graph().width();
+        if (i === 0) {
+          sketch.UI.getInputFromUser(
+            "Desired artboard width?", {
+              initialValue: ''
+            },
+            (err, value) => {
+              if (err) {
+                return
+              } else {
+                width = value
+              }
+            }
+          )
+        
+          sketch.UI.getInputFromUser(
+            "Desired artboard height?", {
+              initialValue: ''
+            },
+            (err, value) => {
+              if (err) {
+                return
+              } else {
+                height = value
+              }
+            }
+          )
+        }
 
-        const frame = NSMakeRect(currentX, 0, width, importer.graph().height());
+        const frame = NSMakeRect(currentX, 0, width, height);
         const root = MSArtboardGroup.alloc().initWithFrame(frame);
         root.name = name;
         importer.graph().makeLayerWithParentLayer_progress(root, null);
@@ -36,7 +65,8 @@ export default function() {
 
         selectedPage.layers.unshift(root);
 
-        currentX += width + 20;
+        currentX += parseInt(width) + 20;
+        i += 1;
       })
   );
 }
